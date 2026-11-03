@@ -16,3 +16,6 @@ Run all tests:
 ## GitHub Actions Commit Stage Status Badge
 
 ![Commit Stage](https://github.com/p566-nikhil/catalog-service/actions/workflows/commit-stage.yml/badge.svg)
+
+## Path versus body ISBN
+When PUT /books/1111111111 is sent with a body that contains "isbn": "2222222222" and neither book exists, the book is added to the catalog with the isbn given in the body and not the url. This is not acceptable. What should happen is that if the isbns do not match then a 400 status should be returned.

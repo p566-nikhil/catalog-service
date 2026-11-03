@@ -117,4 +117,20 @@ class BookControllerMvcTests {
                     """))
             .andExpect(status().isOk());
     }
+
+    @Test 
+    void whenIsbnDontMatch() throws Exception {
+        String isbn = "1111111111";
+        mockMvc.perform(put("/books/" + isbn)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "isbn": "2222222222",
+                      "title": "Title",
+                      "author": "Author",
+                      "price": 1.00
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
+    }
 }

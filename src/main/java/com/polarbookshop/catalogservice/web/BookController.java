@@ -43,6 +43,10 @@ public class BookController {
     public ResponseEntity<Book> put(
         @PathVariable String isbn,
         @Valid @RequestBody Book book) {
+    
+    if (!isbn.equals(book.isbn())) {
+        return ResponseEntity.badRequest().build();
+    }
 
     boolean exists = bookService.isBookInCatalog(isbn);
     Book saved = bookService.editBookDetails(isbn, book);
