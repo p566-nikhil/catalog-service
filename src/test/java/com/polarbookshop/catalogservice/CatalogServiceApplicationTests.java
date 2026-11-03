@@ -28,4 +28,50 @@ class CatalogServiceApplicationTests {
                 assertThat(actual.isbn()).isEqualTo(expected.isbn());
             });
     }
+
+	@Test
+	void workflowTest() {
+		var book = new Book("9781234567897", "Title", "Author", 9.90);
+
+		webTestClient
+			.post().uri("/books")
+			.bodyValue(book)
+			.exchange()
+			.expectStatus().isCreated();
+
+		webTestClient
+			.get().uri("/books/{isbn}", book.isbn())
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(Book.class).value(actual -> {
+				assertThat(actual).isNotNull();
+				assertThat(actual.isbn()).isEqualTo(book.isbn());
+				assertThat(actual.title()).isEqualTo(book.title());
+				assertThat(actual.author()).isEqualTo(book.author());
+				assertThat(actual.price()).isEqualTo(book.price());
+			});
+
+		webTestClient
+			.put().uri("/books/{isbn}", book.isbn())
+			.bodyValue(new Book(book.isbn(), "New Title", "New Author", 19.90))
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(Book.class).value(actual -> {
+				assertThat(actual).isNotNull();
+				assertThat(actual.isbn()).isEqualTo(book.isbn());
+				assertThat(actual.title()).isEqualTo("New Title");
+				assertThat(actual.author()).isEqualTo("New Author");
+				assertThat(actual.price()).isEqualTo(19.90);
+			});
+		
+		webTestClient
+			.delete().uri("/books/{isbn}", book.isbn())
+			.exchange()
+			.expectStatus().isNoContent();
+		
+		webTestClient
+    		.get().uri("/books/{isbn}", book.isbn())
+    		.exchange()
+    		.expectStatus().isNotFound();
+	}
 }
