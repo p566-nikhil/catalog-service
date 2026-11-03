@@ -1,5 +1,6 @@
 package com.polarbookshop.catalogservice.web;
 
+import com.polarbookshop.catalogservice.domain.Book;
 import com.polarbookshop.catalogservice.domain.BookNotFoundException;
 import com.polarbookshop.catalogservice.domain.BookAlreadyExistsException;
 import com.polarbookshop.catalogservice.domain.BookService;
@@ -11,9 +12,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookController.class)
@@ -67,5 +70,51 @@ class BookControllerMvcTests {
                     }
                     """))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test 
+    void whenPutCreateBook() throws Exception {
+        String isbn = "1111111111";
+        mockMvc.perform(put("/books/" + isbn)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "isbn": "1111111111",
+                      "title": "Title",
+                      "author": "Author",
+                      "price": 1.00
+                    }
+                    """))
+            .andExpect(status().isCreated());
+    }
+
+    @Test 
+    void whenPutUpdateBook() throws Exception {
+        String isbn = "1111111111";
+        given(bookService.isBookInCatalog(isbn)).willReturn(false, true);
+
+        mockMvc.perform(put("/books/" + isbn)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "isbn": "1111111111",
+                      "title": "Title",
+                      "author": "Author",
+                      "price": 1.00
+                    }
+                    """))
+            .andExpect(status().isCreated());
+
+        mockMvc.perform(put("/books/" + isbn)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "isbn": "1111111111",
+                      "title": "Title Updated",
+                      "author": "Author Updated",
+                      "price": 2.00
+                    }
+                    """))
+            .andExpect(status().isOk());
     }
 }
