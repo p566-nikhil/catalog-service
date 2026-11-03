@@ -22,7 +22,7 @@ class BookValidationTests {
 
     @Test
     void whenAllFieldsCorrectThenValidationSucceeds() {
-        var book = new Book("1234567890", "Title", "Author", 9.90);
+        var book = new Book("123456789X", "Title", "Author", 9.90);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).isEmpty();
     }
@@ -33,12 +33,12 @@ class BookValidationTests {
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
-            .isEqualTo("The ISBN format must be valid.");
+            .isEqualTo("Invalid ISBN");
     }
 
     @Test
     void whenTitleBlank() {
-        var book = new Book("1234567890", "", "Author", 9.90);
+        var book = new Book("123456789X", "", "Author", 9.90);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -47,7 +47,7 @@ class BookValidationTests {
 
     @Test
     void whenAuthorBlank() {
-        var book = new Book("1234567890", "Title", "", 9.90);
+        var book = new Book("123456789X", "Title", "", 9.90);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -56,7 +56,7 @@ class BookValidationTests {
 
     @Test
     void whenPriceMissing() {
-        var book = new Book("1234567890", "Title", "Author", null);
+        var book = new Book("123456789X", "Title", "Author", null);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -65,7 +65,7 @@ class BookValidationTests {
 
     @Test
     void whenPriceZero() {
-        var book = new Book("1234567890", "Title", "Author", 0.0);
+        var book = new Book("123456789X", "Title", "Author", 0.0);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -74,10 +74,42 @@ class BookValidationTests {
 
     @Test
     void whenPriceNegative() {
-        var book = new Book("1234567890", "Title", "Author", -5.0);
+        var book = new Book("123456789X", "Title", "Author", -5.0);
         Set<ConstraintViolation<Book>> violations = validator.validate(book);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
             .isEqualTo("The book price must be greater than zero.");
+    }
+
+    @Test 
+    void whenIsbn10Valid() {
+        var book = new Book("123456789X", "Title", "Author", 9.90);
+        Set<ConstraintViolation<Book>> violations = validator.validate(book);
+        assertThat(violations).isEmpty();
+    }
+
+    @Test 
+    void whenIsbn13Valid() {
+        var book = new Book("9781234567897", "Title", "Author", 9.90);
+        Set<ConstraintViolation<Book>> violations = validator.validate(book);
+        assertThat(violations).isEmpty();
+    }
+
+    @Test 
+    void whenIsbn10Invalid() {
+        var book = new Book("1234567890", "Title", "Author", 9.90);
+        Set<ConstraintViolation<Book>> violations = validator.validate(book);
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage())
+            .isEqualTo("Invalid ISBN");
+    }
+
+    @Test
+    void whenIsbn13Invalid() {
+        var book = new Book("9781234567890", "Title", "Author", 9.90);
+        Set<ConstraintViolation<Book>> violations = validator.validate(book);
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage())
+            .isEqualTo("Invalid ISBN");
     }
 }
