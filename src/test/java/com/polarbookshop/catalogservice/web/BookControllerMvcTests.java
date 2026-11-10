@@ -18,6 +18,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(BookController.class)
 class BookControllerMvcTests {
@@ -133,4 +135,26 @@ class BookControllerMvcTests {
                     """))
             .andExpect(status().isBadRequest());
     }
+
+    @Test 
+    void whenGetBooksByAuthor() throws Exception {
+        String author = "Author";
+        given(bookService.viewBooksByAuthor(author))
+            .willReturn(List.of(
+                Book.of("1111111111", "Title 1", author, null, 1.00),
+                Book.of("2222222222", "Title 2", author, null, 2.00)
+            ));
+
+        mockMvc.perform(get("/books?author=" + author))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].isbn").value("1111111111"))
+            .andExpect(jsonPath("$[0].title").value("Title 1"))
+            .andExpect(jsonPath("$[0].author").value(author))
+            .andExpect(jsonPath("$[0].price").value(1.00))
+            .andExpect(jsonPath("$[1].isbn").value("2222222222"))
+            .andExpect(jsonPath("$[1].title").value("Title 2"))
+            .andExpect(jsonPath("$[1].author").value(author))
+            .andExpect(jsonPath("$[1].price").value(2.00));
+    }
+
 }

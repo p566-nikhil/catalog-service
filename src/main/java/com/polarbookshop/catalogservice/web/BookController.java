@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+
 @RestController
 @RequestMapping("books")
 public class BookController {
@@ -18,7 +19,11 @@ public class BookController {
     }
 
     @GetMapping
-    public Iterable<Book> get() {
+    public Iterable<Book> get(@RequestParam(required = false) String author) {
+        if (author != null) {
+            return bookService.viewBooksByAuthor(author);
+        }
+
         return bookService.viewBookList();
     }
 
@@ -55,4 +60,5 @@ public class BookController {
         ? ResponseEntity.ok(saved) 
         : ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+    
 }

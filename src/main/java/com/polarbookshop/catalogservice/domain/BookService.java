@@ -32,6 +32,10 @@ public class BookService {
         bookRepository.deleteByIsbn(isbn);
     }
 
+    public Iterable<Book> viewBooksByAuthor(String author) {
+        return bookRepository.findByAuthor(author);
+    }
+
     public Book editBookDetails(String isbn, Book book) {
     return bookRepository.findByIsbn(isbn)
         .map(existing -> {

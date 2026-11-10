@@ -53,7 +53,7 @@ class BookRepositoryJdbcTests {
         jdbcAggregateTemplate.insert(book2);
 
     assertThat(bookRepository.findAll()).hasSize(2);
-}
+    }
 
     @Test 
     void existsByIsbnTrue() {
@@ -83,5 +83,18 @@ class BookRepositoryJdbcTests {
         var saved = jdbcAggregateTemplate.insert(book);
 
         assertThat(saved.createdDate()).isNotNull();
+    }
+
+    @Test 
+    void findBooksbyAuthor() {
+        var book1 = Book.of("1234561239", "Title 1", "Author 1", null, 12.90);
+        var book2 = Book.of("1234561240", "Title 2", "Author 1", null, 13.90);
+        var book3 = Book.of("1234561241", "Title 3", "Author 2", null, 14.90);
+        jdbcAggregateTemplate.insert(book1);
+        jdbcAggregateTemplate.insert(book2);
+        jdbcAggregateTemplate.insert(book3);
+
+        assertThat(bookRepository.findByAuthor("Author 1")).hasSize(2);
+        assertThat(bookRepository.findByAuthor("Author 2")).hasSize(1);
     }
 }

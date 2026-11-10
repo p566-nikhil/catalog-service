@@ -1,5 +1,6 @@
 package com.polarbookshop.catalogservice.domain;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
@@ -19,4 +20,6 @@ public interface BookRepository extends CrudRepository<Book, Long> {
     @Transactional
     @Query("delete from book where isbn = :isbn")
     void deleteByIsbn(String isbn);
+
+    List<Book> findByAuthor(String author);
 }
