@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 @WebMvcTest(BookController.class)
 class BookControllerMvcTests {
@@ -156,5 +157,23 @@ class BookControllerMvcTests {
             .andExpect(jsonPath("$[1].author").value(author))
             .andExpect(jsonPath("$[1].price").value(2.00));
     }
+    
+    @Test 
+    void optimisticLockingFailure() throws Exception {
+        String isbn = "1111111111";
+        given(bookService.editBookDetails(eq(isbn), any()))
+            .willThrow(new OptimisticLockingFailureException("Optimistic locking failure"));
 
+        mockMvc.perform(put("/books/" + isbn)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "isbn": "1111111111",
+                      "title": "Title",
+                      "author": "Author",
+                      "price": 1.00
+                    }
+                    """))
+            .andExpect(status().isConflict());
+    }
 }

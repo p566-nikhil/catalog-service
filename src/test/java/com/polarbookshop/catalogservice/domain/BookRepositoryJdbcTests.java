@@ -12,6 +12,8 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 @DataJdbcTest
 @Import(DataConfig.class)            // auditing is not part of the slice by default
@@ -97,4 +99,43 @@ class BookRepositoryJdbcTests {
         assertThat(bookRepository.findByAuthor("Author 1")).hasSize(2);
         assertThat(bookRepository.findByAuthor("Author 2")).hasSize(1);
     }
+
+    @Test 
+    void optimisticLocking() {
+        var book = Book.of("1234561239", "Title", "Author", null, 12.90);
+        var saved = jdbcAggregateTemplate.insert(book);
+
+        var firstcopy = bookRepository.findByIsbn("1234561239").get();
+        var secondcopy = bookRepository.findByIsbn("1234561239").get();
+
+        var updatedFirstcopy = new Book(
+            firstcopy.id(),
+            firstcopy.isbn(),
+            "New",
+            firstcopy.author(),
+            firstcopy.publisher(),
+            firstcopy.price(),
+            firstcopy.createdDate(),
+            firstcopy.lastModifiedDate(),
+            firstcopy.version()
+        );
+        bookRepository.save(updatedFirstcopy);
+
+        var updatedSecondcopy = new Book(
+            secondcopy.id(),
+            secondcopy.isbn(),
+            "Old",
+            secondcopy.author(),
+            secondcopy.publisher(),
+            secondcopy.price(),
+            secondcopy.createdDate(),
+            secondcopy.lastModifiedDate(),
+            secondcopy.version()
+        );
+
+        assertThatThrownBy(() -> bookRepository.save(updatedSecondcopy))
+            .isInstanceOf(OptimisticLockingFailureException.class);
+    }
+
+
 }
