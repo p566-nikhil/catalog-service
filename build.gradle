@@ -21,7 +21,7 @@ repositories {
 }
 
 bootRun {
-    systemProperty 'spring.profiles.active', 'testdata'
+    systemProperty 'polar.testdata.enabled', 'true'
 }
 
 dependencies {
