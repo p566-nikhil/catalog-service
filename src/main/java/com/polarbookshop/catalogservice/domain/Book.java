@@ -24,6 +24,8 @@ public record Book(
 
     @NotBlank(message = "The book author must be defined.")
     String author,
+    
+    String publisher,
 
     @NotNull(message = "The book price must be defined.")
     @Positive(message = "The book price must be greater than zero.")
@@ -40,7 +42,7 @@ public record Book(
 
 ) {
     // Convenience factory: the framework fills in id, dates, and version.
-    public static Book of(String isbn, String title, String author, Double price) {
-        return new Book(null, isbn, title, author, price, null, null, 0);
+    public static Book of(String isbn, String title, String author, String publisher, Double price) {
+        return new Book(null, isbn, title, author, publisher, price, null, null, 0);
     }
 }

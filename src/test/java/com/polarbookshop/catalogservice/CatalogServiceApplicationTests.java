@@ -18,7 +18,7 @@ class CatalogServiceApplicationTests {
 
     @Test
     void whenPostRequestThenBookCreated() {
-        var expected = Book.of("123456789X", "Title", "Author", 9.90);
+        var expected = Book.of("123456789X", "Title", "Author", null, 9.90);
 
         webTestClient
             .post().uri("/books")
@@ -28,12 +28,13 @@ class CatalogServiceApplicationTests {
             .expectBody(Book.class).value(actual -> {
                 assertThat(actual).isNotNull();
                 assertThat(actual.isbn()).isEqualTo(expected.isbn());
+                assertThat(actual.publisher()).isNull();
             });
     }
 
     @Test
     void workflowTest() {
-        var book = Book.of("9781234567897", "Title", "Author", 9.90);
+        var book = Book.of("9781234567897", "Title", "Author", null, 9.90);
 
         webTestClient
             .post().uri("/books")
@@ -50,12 +51,15 @@ class CatalogServiceApplicationTests {
                 assertThat(actual.isbn()).isEqualTo(book.isbn());
                 assertThat(actual.title()).isEqualTo(book.title());
                 assertThat(actual.author()).isEqualTo(book.author());
+                assertThat(actual.publisher()).isNull();
                 assertThat(actual.price()).isEqualTo(book.price());
             });
 
         webTestClient
             .put().uri("/books/{isbn}", book.isbn())
-            .bodyValue(Book.of(book.isbn(), "New Title", "New Author", 19.90))
+            .bodyValue(Book.of(
+                book.isbn(), "New Title", "New Author", null, 19.90
+            ))
             .exchange()
             .expectStatus().isOk()
             .expectBody(Book.class).value(actual -> {
@@ -63,6 +67,7 @@ class CatalogServiceApplicationTests {
                 assertThat(actual.isbn()).isEqualTo(book.isbn());
                 assertThat(actual.title()).isEqualTo("New Title");
                 assertThat(actual.author()).isEqualTo("New Author");
+                assertThat(actual.publisher()).isNull();
                 assertThat(actual.price()).isEqualTo(19.90);
             });
 
