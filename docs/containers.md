@@ -85,3 +85,6 @@ PS C:\Users\nikhi\Desktop\catalog-service\catalog-service> docker build -t catal
  => => naming to docker.io/library/catalog-service:dockerfile                                                                                                0.0s
  => => unpacking to docker.io/library/catalog-service:dockerfile                                                                                             0.0s
 PS C:\Users\nikhi\Desktop\catalog-service\catalog-service> 
+
+## 3.1 
+Running docker compose down and up again removes the books because the data is not persistent. When a container is made, the test data is injected into it. When a container is shut down, the test data is discarded. There is no permanent storage set up yet.
