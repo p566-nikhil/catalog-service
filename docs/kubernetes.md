@@ -1,0 +1,1 @@
+After deleting a pod, the readiness probe returned status Error, ContainerCreated, and then Running in that order. After the readiness probe succeeded, the second replica was fully operational.

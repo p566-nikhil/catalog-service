@@ -1,3 +1,13 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 spring:
   application:
     name: catalog-service
@@ -8,11 +18,14 @@ spring:
     hikari:
       connection-timeout: 2000
       maximum-pool-size: 5
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
 
 polar:
   greeting: Welcome to the local book catalog!
 
 server:
+  shutdown: graceful
   port: 9001
   tomcat:
     connection-timeout: 2s
