@@ -29,6 +29,8 @@ spec:
               value: testdata
             - name: POLAR_TESTDATA_ENABLED
               value: "true"
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: http://polar-keycloak:8080/realms/PolarBookshop
           resources:
             requests:
               cpu: 100m

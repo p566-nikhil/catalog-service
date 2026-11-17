@@ -48,8 +48,10 @@ public class BookService {
                 book.price(),
                 existing.createdDate(),
                 existing.lastModifiedDate(),
+                existing.createdBy(),
+                existing.lastModifiedBy(),
                 existing.version()
-            );
+);
 
             return bookRepository.save(updated);
         })

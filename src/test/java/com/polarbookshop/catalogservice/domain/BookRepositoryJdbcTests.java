@@ -14,6 +14,8 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 
 @DataJdbcTest
 @Import(DataConfig.class)            // auditing is not part of the slice by default
@@ -117,6 +119,8 @@ class BookRepositoryJdbcTests {
             firstcopy.price(),
             firstcopy.createdDate(),
             firstcopy.lastModifiedDate(),
+            firstcopy.createdBy(),
+            firstcopy.lastModifiedBy(),
             firstcopy.version()
         );
         bookRepository.save(updatedFirstcopy);
@@ -130,6 +134,8 @@ class BookRepositoryJdbcTests {
             secondcopy.price(),
             secondcopy.createdDate(),
             secondcopy.lastModifiedDate(),
+            secondcopy.createdBy(),
+            secondcopy.lastModifiedBy(),
             secondcopy.version()
         );
 
@@ -137,5 +143,37 @@ class BookRepositoryJdbcTests {
             .isInstanceOf(OptimisticLockingFailureException.class);
     }
 
+    @Test
+    @WithAnonymousUser
+    void whenCreateBookNotAuthenticatedThenNoAuditMetadata() {
+    var created = bookRepository.save(
+        Book.of(
+            "1232343456",
+            "Title",
+            "Author",
+            "Polarsophia",
+            12.90
+        )
+    );
 
+    assertThat(created.createdBy()).isNull();
+    assertThat(created.lastModifiedBy()).isNull();
+}
+
+    @Test
+    @WithMockUser("john")
+    void whenCreateBookAuthenticatedThenAuditMetadata() {
+    var created = bookRepository.save(
+        Book.of(
+            "1232343457",
+            "Title",
+            "Author",
+            "Polarsophia",
+            12.90
+        )
+    );
+
+    assertThat(created.createdBy()).isEqualTo("john");
+    assertThat(created.lastModifiedBy()).isEqualTo("john");
+}
 }

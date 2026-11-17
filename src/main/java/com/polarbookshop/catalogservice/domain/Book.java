@@ -5,26 +5,29 @@ import java.time.Instant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 
 public record Book(
 
     @Id
-    Long id,                          // technical (surrogate) primary key
+    Long id,
 
     @NotBlank(message = "The book ISBN must be defined.")
     @ValidIsbn(message = "Invalid ISBN")
-    String isbn,                      // natural (business) key, still unique
+    String isbn,
 
     @NotBlank(message = "The book title must be defined.")
     String title,
 
     @NotBlank(message = "The book author must be defined.")
     String author,
-    
+
     String publisher,
 
     @NotNull(message = "The book price must be defined.")
@@ -32,17 +35,31 @@ public record Book(
     Double price,
 
     @CreatedDate
-    Instant createdDate,              // set once, on insert
+    Instant createdDate,
 
     @LastModifiedDate
-    Instant lastModifiedDate,         // set on every insert and update
+    Instant lastModifiedDate,
+
+    @CreatedBy
+    String createdBy,
+
+    @LastModifiedBy
+    String lastModifiedBy,
 
     @Version
-    int version                       // optimistic locking
+    int version
 
 ) {
-    // Convenience factory: the framework fills in id, dates, and version.
-    public static Book of(String isbn, String title, String author, String publisher, Double price) {
-        return new Book(null, isbn, title, author, publisher, price, null, null, 0);
+    public static Book of(
+            String isbn,
+            String title,
+            String author,
+            String publisher,
+            Double price) {
+
+        return new Book(
+            null, isbn, title, author, publisher, price,
+            null, null, null, null, 0
+        );
     }
 }
